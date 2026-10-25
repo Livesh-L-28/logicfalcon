@@ -273,6 +273,18 @@ def build_root_parser() -> argparse.ArgumentParser:
         add_help=False,
     )
 
+    # Subcommand: extension
+    subparsers.add_parser(
+        "extension",
+        help="Discover, install, configure, monitor, update, and manage extensions.",
+        add_help=False,
+    )
+    subparsers.add_parser(
+        "extensions",
+        help="Alias for extension.",
+        add_help=False,
+    )
+
     return parser
 
 
@@ -840,6 +852,11 @@ def run_main(args: list[str] | None = None) -> int:
 
         return run_fde_cli(argv[1:])
 
+    if argv[0] in ("extension", "extensions"):
+        from packages.review.extensions.cli import run_extension_cli
+
+        return run_extension_cli(argv[1:])
+
     # Fallback to standard argparsing
     parser = build_root_parser()
     parsed = parser.parse_args(argv)
@@ -869,6 +886,10 @@ def run_main(args: list[str] | None = None) -> int:
         from packages.review.fde.cli import run_fde_cli
 
         return run_fde_cli(argv[1:])
+    elif parsed.subcommand in ("extension", "extensions"):
+        from packages.review.extensions.cli import run_extension_cli
+
+        return run_extension_cli(argv[1:])
 
     parser.print_help()
     return 0

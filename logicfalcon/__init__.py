@@ -5,6 +5,11 @@ evidence-grounded code review, repository analysis, change-impact assessment,
 root-cause analysis, and safe fix proposals. Powered by AEGIS AI.
 """
 
+__version__ = "0.1.5"
+__product__ = "LogicFalcon"
+__tagline__ = "Fast, precise engineering intelligence."
+__platform__ = "AEGIS AI"
+
 try:
     from packages.intelligence.debugging.service import AutonomousDebuggingService
 except (ImportError, ModuleNotFoundError):
@@ -21,15 +26,27 @@ except (ImportError, ModuleNotFoundError):
             )
 
 from logicfalcon.sdk import (
+    BaseExtension,
     DeploymentInventory,
+    ExtensionExecutionContext,
+    ExtensionExecutionResult,
+    ExtensionFinding,
+    ExtensionHealthReport,
+    ExtensionManager,
+    ExtensionManifest,
+    ExtensionRegistry,
+    ExtensionStateRecord,
+    ExtensionStorageScope,
     FdeMission,
     FdeStep,
+    InstallationPlan,
     MissionOrchestrator,
     MissionStatus,
     OperationCategory,
     PolicyGateway,
     PreflightReport,
     Runbook,
+    StaticAnalysisExtension,
     analyze_architecture,
     analyze_impact,
     analyze_impact_with_review,
@@ -38,6 +55,9 @@ from logicfalcon.sdk import (
     apply_fix,
     capture_snapshot,
     compare_snapshots,
+    diagnose_extensions,
+    disable_extension,
+    enable_extension,
     estimate_debt,
     evaluate_history_policy,
     fde_generate_runbook,
@@ -45,6 +65,9 @@ from logicfalcon.sdk import (
     fde_plan,
     fde_preflight,
     fde_run_mission,
+    get_extension,
+    install_extension,
+    list_extensions,
     list_snapshots,
     reverse_engineer,
     reverse_engineer_with_review,
@@ -52,6 +75,7 @@ from logicfalcon.sdk import (
     review_diff,
     review_file,
     review_workspace,
+    uninstall_extension,
     verify_fix,
 )
 from packages.review.adapters.base import (
@@ -125,17 +149,13 @@ from packages.review.unified.recommendations import RecommendationSynthesizer
 from packages.review.unified.report_generator import UnifiedReportGenerator
 from packages.review.validator import FindingValidator
 
-__version__ = "0.1.4"
-__product__ = "LogicFalcon"
-__tagline__ = "Fast, precise engineering intelligence."
-__platform__ = "AEGIS AI"
-
 __all__ = [
     "AnalyzerRegistry",
     "ArchitectureAnalyzer",
     "ArchitecturePolicy",
     "ArchitectureReport",
     "AutonomousDebuggingService",
+    "BaseExtension",
     "BoundaryRule",
     "BoundaryViolation",
     "ChangeImpactEngine",
@@ -146,6 +166,15 @@ __all__ = [
     "DeploymentInventory",
     "EngineeringPolicyEvaluator",
     "EngineeringTrendReport",
+    "ExtensionExecutionContext",
+    "ExtensionExecutionResult",
+    "ExtensionFinding",
+    "ExtensionHealthReport",
+    "ExtensionManager",
+    "ExtensionManifest",
+    "ExtensionRegistry",
+    "ExtensionStateRecord",
+    "ExtensionStorageScope",
     "FdeMission",
     "FdeStep",
     "FindingCategory",
@@ -159,6 +188,7 @@ __all__ = [
     "ImpactRiskLevel",
     "ImpactType",
     "ImpactedEntity",
+    "InstallationPlan",
     "LayerDefinition",
     "LocalReviewEngine",
     "MissionOrchestrator",
@@ -191,6 +221,7 @@ __all__ = [
     "SnapshotMetadata",
     "SnapshotSummary",
     "StaticAnalysisAdapter",
+    "StaticAnalysisExtension",
     "TechnicalDebtEstimate",
     "TestImpactCandidate",
     "TrendDirection",
@@ -212,6 +243,9 @@ __all__ = [
     "build_parser",
     "capture_snapshot",
     "compare_snapshots",
+    "diagnose_extensions",
+    "disable_extension",
+    "enable_extension",
     "estimate_debt",
     "evaluate_history_policy",
     "fde_generate_runbook",
@@ -219,7 +253,10 @@ __all__ = [
     "fde_plan",
     "fde_preflight",
     "fde_run_mission",
+    "get_extension",
     "global_analyzer_registry",
+    "install_extension",
+    "list_extensions",
     "list_snapshots",
     "reverse_engineer",
     "reverse_engineer_with_review",
@@ -228,6 +265,7 @@ __all__ = [
     "review_file",
     "review_workspace",
     "run_cli",
+    "uninstall_extension",
     "verify_fix",
 ]
 

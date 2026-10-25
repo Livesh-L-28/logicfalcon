@@ -28,6 +28,35 @@ from packages.review.domain.models import (
     RuleException,
 )
 from packages.review.engine import LocalReviewEngine, ReviewConfig
+from packages.review.extensions import (
+    BaseExtension as BaseExtension,
+)
+from packages.review.extensions import (
+    ExtensionExecutionContext as ExtensionExecutionContext,
+)
+from packages.review.extensions import (
+    ExtensionExecutionResult as ExtensionExecutionResult,
+)
+from packages.review.extensions import (
+    ExtensionFinding as ExtensionFinding,
+)
+from packages.review.extensions import (
+    ExtensionHealthReport,
+    ExtensionManager,
+    ExtensionManifest,
+    ExtensionStateRecord,
+    ExtensionStorageScope,
+    InstallationPlan,
+)
+from packages.review.extensions import (
+    ExtensionRegistry as ExtensionRegistry,
+)
+from packages.review.extensions import (
+    StaticAnalysisExtension as StaticAnalysisExtension,
+)
+from packages.review.extensions import (
+    global_extension_registry as global_extension_registry,
+)
 from packages.review.fde import (
     AdapterCapability,
     AdapterExecutionResult,
@@ -927,3 +956,78 @@ def fde_run_mission(
         policy_gateway=gateway,
     )
     return orchestrator.run_mission(mission, approval_tokens=approval_tokens or {})
+
+
+def list_extensions(
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> list[tuple[ExtensionManifest, ExtensionStateRecord]]:
+    """Discover and return all installed LogicFalcon extensions across scopes."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    return manager.discover()
+
+
+def get_extension(
+    extension_id: str,
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> ExtensionManifest | None:
+    """Retrieve metadata for an installed extension by ID."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    manager.discover()
+    entry = manager.registry.get(extension_id)
+    return entry.manifest if entry else None
+
+
+def install_extension(
+    source: str | Path,
+    workspace: bool = False,
+    dry_run: bool = False,
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> InstallationPlan:
+    """Install or preview installation of a LogicFalcon extension."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    scope = ExtensionStorageScope.WORKSPACE if workspace else ExtensionStorageScope.USER
+    return manager.install(source, scope=scope, dry_run=dry_run)
+
+
+def enable_extension(
+    extension_id: str,
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> ExtensionStateRecord:
+    """Enable an installed extension."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    return manager.enable(extension_id)
+
+
+def disable_extension(
+    extension_id: str,
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> ExtensionStateRecord:
+    """Disable an active extension."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    return manager.disable(extension_id)
+
+
+def uninstall_extension(
+    extension_id: str,
+    purge_config: bool = False,
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> None:
+    """Uninstall an extension, optionally purging saved configuration."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    manager.uninstall(extension_id, purge_config=purge_config)
+
+
+def diagnose_extensions(
+    workspace_dir: Path | None = None,
+    user_dir: Path | None = None,
+) -> list[ExtensionHealthReport]:
+    """Run non-destructive diagnostic health checks on all installed extensions."""
+    manager = ExtensionManager(workspace_dir=workspace_dir, user_dir=user_dir)
+    return manager.diagnose()
+

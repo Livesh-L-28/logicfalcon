@@ -1,0 +1,30 @@
+schema_version: "1.0.0"
+id: "org.logicfalcon.todo-analyzer"
+name: "TODO & Debt Analyzer"
+version: "0.1.0"
+description: "Deterministic AST comment inspection for unresolved TODO, FIXME, and BUG technical debt markers."
+author: "LogicFalcon Team"
+license: "Apache-2.0"
+compatibility:
+  logicfalcon: ">=0.1.4"
+  python: ">=3.12"
+capabilities:
+  - capability: "project:read"
+    description: "Read project source files for inspection"
+  - capability: "project:analyze"
+    description: "Inspect comments and AST tokens"
+entry_points:
+  analyzer:
+    - name: "todo"
+      target: "analyzer:TodoAnalyzerExtension"
+      execution_mode: "in_process"
+      description: "Default TODO and FIXME analyzer entry point"
+configuration_schema:
+  type: "object"
+  properties:
+    include_todo:
+      type: "boolean"
+      default: true
+    include_fixme:
+      type: "boolean"
+      default: true
