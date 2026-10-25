@@ -102,7 +102,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                 items = [it for it in items if it[1].scope == target_scope]
 
             if parsed.json:
-                data = [
+                list_data = [
                     {
                         "id": m.id,
                         "name": m.name,
@@ -115,7 +115,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                     }
                     for m, s in items
                 ]
-                sys.stdout.write(json.dumps(data, indent=2) + "\n")
+                sys.stdout.write(json.dumps(list_data, indent=2) + "\n")
                 return 0
 
             sys.stdout.write(f"\nInstalled LogicFalcon Extensions ({len(items)} found):\n")
@@ -140,11 +140,11 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                 return 1
 
             if parsed.json:
-                data = {
+                inspect_data = {
                     "manifest": entry.manifest.model_dump(mode="json"),
                     "state": entry.state.model_dump(mode="json"),
                 }
-                sys.stdout.write(json.dumps(data, indent=2) + "\n")
+                sys.stdout.write(json.dumps(inspect_data, indent=2) + "\n")
                 return 0
 
             m = entry.manifest
@@ -179,7 +179,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
             is_compat, msg = check_compatibility(manifest)
 
             if parsed.json:
-                data = {
+                validate_data = {
                     "valid": True,
                     "id": manifest.id,
                     "name": manifest.name,
@@ -188,7 +188,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                     "compatibility_message": msg,
                     "capabilities": [c.capability for c in manifest.capabilities],
                 }
-                sys.stdout.write(json.dumps(data, indent=2) + "\n")
+                sys.stdout.write(json.dumps(validate_data, indent=2) + "\n")
                 return 0
 
             sys.stdout.write(f"✓ Manifest '{manifest_file}' is syntactically valid.\n")
@@ -203,7 +203,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
             plan = mgr.install(parsed.source, scope=scope, dry_run=parsed.dry_run)
 
             if parsed.json:
-                data = {
+                install_data = {
                     "extension_id": plan.extension_id,
                     "name": plan.name,
                     "version": plan.version,
@@ -213,7 +213,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                     "dry_run": parsed.dry_run,
                     "capabilities": plan.requested_capabilities,
                 }
-                sys.stdout.write(json.dumps(data, indent=2) + "\n")
+                sys.stdout.write(json.dumps(install_data, indent=2) + "\n")
                 return 0
 
             prefix = "[DRY-RUN] " if parsed.dry_run else ""
@@ -242,12 +242,12 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
         elif parsed.action == "update":
             plan = mgr.update(parsed.extension_id, parsed.source)
             if parsed.json:
-                data = {
+                update_data = {
                     "extension_id": plan.extension_id,
                     "updated_version": plan.version,
                     "scope": plan.target_scope.value,
                 }
-                sys.stdout.write(json.dumps(data, indent=2) + "\n")
+                sys.stdout.write(json.dumps(update_data, indent=2) + "\n")
                 return 0
             sys.stdout.write(f"✓ Extension '{plan.extension_id}' updated to v{plan.version}.\n")
             sys.stdout.write("  Previous version snapshot retained for rollback.\n")
@@ -282,9 +282,9 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                 if not r.healthy:
                     all_ok = False
                 sys.stdout.write(f"[{status_icon}] {r.extension_id} v{r.version} ({r.state.value})\n")
-                for c in r.checks:
-                    chk_icon = "✓" if c["passed"] else "✗"
-                    sys.stdout.write(f"       {chk_icon} {c['probe']}: {c['message']}\n")
+                for chk in r.checks:
+                    chk_icon = "✓" if chk["passed"] else "✗"
+                    sys.stdout.write(f"       {chk_icon} {chk['probe']}: {chk['message']}\n")
             sys.stdout.write("-" * 70 + "\n")
             sys.stdout.write(f"Diagnostic result: {'All extensions healthy' if all_ok else 'Issues detected'}\n\n")
             return 0 if all_ok else 1
@@ -299,7 +299,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
             ]
 
             if parsed.json:
-                data = [
+                search_data = [
                     {
                         "id": e.manifest.id,
                         "name": e.manifest.name,
@@ -309,7 +309,7 @@ def run_extension_cli(args: list[str], manager: ExtensionManager | None = None) 
                     }
                     for e in matches
                 ]
-                sys.stdout.write(json.dumps(data, indent=2) + "\n")
+                sys.stdout.write(json.dumps(search_data, indent=2) + "\n")
                 return 0
 
             sys.stdout.write(f"\nSearch results for '{parsed.query}' ({len(matches)} matches):\n")
