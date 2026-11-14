@@ -13,7 +13,14 @@
 pip install logicfalcon
 ```
 
-### 2. Developer CLI Usage
+### 2. 30-Second Terminal Health Check
+
+```bash
+# One-liner verification
+python3 -c "import logicfalcon; print(f'LogicFalcon {logicfalcon.__version__} ready.')" && logicfalcon doctor
+```
+
+### 3. Developer CLI Usage
 
 ```bash
 # Verify environment and AST analyzer capabilities
